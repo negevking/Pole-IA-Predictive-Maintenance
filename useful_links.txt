@@ -1,0 +1,4 @@
+Mathworks ebook:             https://www.mathworks.com/content/dam/mathworks/ebook/gated/predictive-maintenance-ebook-all-chapters.pdf
+Mathworks video series:      https://uk.mathworks.com/videos/series/predictive-maintenance-tech-talk-series.html
+Mathworks Anomaly Detection: https://uk.mathworks.com/videos/introduction-to-anomaly-detection-for-engineers-1663930223584.html
+ 

@@ -2,6 +2,8 @@
 %characteristics of our data
 
 n1=50;
+n2=585936;
+n3 = 2559;
 
 path_directory='C:\Users\bensi\Documents\Coding\Project\Pole-IA-Predictive-Maintenance\Data'; 
 
@@ -10,18 +12,17 @@ original_files=dir([path_directory '/*.mat']);
 for k=1:length(original_files)
     filename=[path_directory '/' original_files(k).name];
     load(filename); 
-    time = linspace((k-1), k, length(vibration));
+    time = linspace((k-1), k, n2);
     subplot(1, 2, 1);
     plot(time, vibration);
     hold on
-    time = linspace((k-1), k, length(tach));
+    time = linspace((k-1), k, n3);
     subplot(1, 2, 2);
     plot(time, tach);
-    hold on
 end
 
 hold off
 subplot(1, 2, 1);
 title('vibration')
-subplot(1, 2, 2);
-title('tachometer')
+subplot(1, 2, 1);
+title('vibration')

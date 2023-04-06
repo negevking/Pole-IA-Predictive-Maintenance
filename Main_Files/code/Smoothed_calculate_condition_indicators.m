@@ -1,49 +1,64 @@
-features = readtable("brutefeatures.txt");
+%DIEGO THIS IS THE RIGHT FILE
+features = readtable("brutefeatures.txt"); %raw features - CURRENTLY ONLY USING VIBRATION - ADD DERIVED TACHOMETER AS WELL
 featureTable = table2timetable(features);
 clear features
 variableNames = featureTable.Properties.VariableNames;
-featureTableSmooth = varfun(@(x) movmean(x, [5 0]), featureTable);
+featureTableSmooth = varfun(@(x) movmean(x, [5 0]), featureTable); %smoothes features with moving average
 featureTableSmooth.Properties.VariableNames = variableNames;
 %% 
-featureImportance = monotonicity(featureTableSmooth, 'WindowSize', 0);
+times = linspace(1, 50, 50);
+plot(featureTable.Date, featureTable.vibration_res_sigstatsClearanceFactor)
+hold on
+plot(featureTableSmooth.Date, featureTableSmooth.vibration_res_sigstatsClearanceFactor)
+legend('Raw signal', 'Smooth signal')
+xlabel('Date')
+ylabel('Amplitude')
+title('Comparison of vibration-res-sigstatsClearanceFactor before and after smoothing')
+hold off
+
+%% 
+featureImportance = monotonicity(featureTableSmooth, 'WindowSize', 0); %calcualtes importance of smoothed features
 helperSortedBarPlot(featureImportance, 'Monotonicity');
 %% 
-featureSelected = featureTableSmooth(:, featureImportance{:,:}>0.3);
+featureSelected = featureTableSmooth(:, featureImportance{:,:}>0.3); %only takes important ones
+featureSelected = timetable2table(featureSelected);
+n_features = size(featureSelected);
+n_features = n_features(2);
+%% 
 
-top5_normalised = zeros(size(top5));
-for i = 1:5
-    top5_normalised(:, i) = (top5(:, i) - top5(1,i));
-    top5_normalised(:, i) = top5_normalised(:, i)/top5_normalised(50, i);
+features_normalised = zeros(size(featureSelected));
+featureSelected1 = removevars(featureSelected, 'Date');
+featuresSelected = table2array(featureSelected1);
+n_features = size(featuresSelected);
+n_features = n_features(2);
+for i = 1:n_features
+    for d = 1:50
+        features_normalised(d, i) = (featuresSelected(d, i) - featuresSelected(1,i)); %normalies features between 0 and 1
+    end
+    for d = 1:50
+        features_normalised(d, i) = features_normalised(d, i)/features_normalised(50, i);
+    end
 end
-%top5_normalised(:, 2) = ones(50, 1) - top5_normalised(:,2);
-weighted_features = zeros(size(top5));
-for i = 1:5
-    weighted_features(:, i) = weighting(i)*top5_normalised(:, i);
-end
+plot(times, features_normalised(:,1))
+%% 
 condition_indicator = zeros(50,1);
 for i = 1:50
-    condition_indicator(i) = sum(weighted_features(i,:));
+    condition_indicator(i) = sum(features_normalised(i,:)); %creates condition indicator by summing the features with equal weighting - ADD PRINCIPAL COMPONENT ANALYSIS
 end
-condition_indicators = zeros(50, 2);
-condition_indicators(:, 1) = linspace(1, 50, 50);
-condition_indicators(:, 2) = condition_indicator;
-writematrix(condition_indicators);
-for i = 1:5
-    plot(condition_indicators(:, 1), weighted_features(:, i))
+
+for i = 1:n_features
+    plot(times, features_normalised(:,i), 'DisplayName', 'off')
     hold on
 end
-plot(condition_indicators(:, 1), condition_indicators(:, 2))
+plot(times, condition_indicator/18, 'DisplayName', 'Combined Indicator', 'LineWidth', 4) %plots indicator
 hold off
+
+title('Comparision of features and indicator')
 xlabel('Day')
 ylabel('Condition')
 
-test_days = [1, 11, 22, 33, 45];
-condition_indicators_test = condition_indicators(test_days, :);
-train_days = setdiff(condition_indicators(:,1), test_days);
-condition_indicators_train = condition_indicators(train_days, :);
+
+
+
+
 %% 
-condition_indicators_train = array2table(condition_indicators_train, 'VariableNames',{'Time','Condition'});
-condition_indicators_test = array2table(condition_indicators_test, 'VariableNames',{'Time','Condition'});
-%% 
-save('train_data.mat', "condition_indicators_train");
-save('test_data.mat', "condition_indicators_test");

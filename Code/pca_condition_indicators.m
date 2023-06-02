@@ -1,5 +1,5 @@
 
-features = readtable("featureSets/cleanFeat_02.txt"); %raw features - CURRENTLY ONLY USING VIBRATION - need to ADD DERIVED TACHOMETER AS WELL
+features = readtable("featureSets/cleanFeat_04.txt"); %raw features - CURRENTLY ONLY USING VIBRATION - need to ADD DERIVED TACHOMETER AS WELL
 featureTable = table2timetable(features);
 clear features
 variableNames = featureTable.Properties.VariableNames;
@@ -36,7 +36,7 @@ featuresCentered = featuresCentered./sdTrain;
 
 covariance = cov(featuresSelected);
 [coeff, score, latent] = pca(covariance, 'NumComponents', 1);
-%coeff = ones(size(coeff)); %simple sum
+coeff = ones(size(coeff)); %simple sum
 condition_indicator = featuresCentered * coeff;
 
 for i = 1:n_features
@@ -64,7 +64,7 @@ test_data = table(condition_indicator(split_day+1:end));
 
 save('Test_data.mat', "test_data")
 save('train_data.mat', "train_data")
-title('Condition Indicator Monotonicity = 0.3')
+title('Condition Indicator Monotonicity = ?')
 xlabel('Day')
 ylabel('Condition')
 

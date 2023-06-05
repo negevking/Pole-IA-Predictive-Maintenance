@@ -1,3 +1,5 @@
+%this file takes a feature set, then combines then into a condition
+%indicator. It then saves this as a table
 
 features = readtable("featureSets/cleanFeat_04.txt"); %raw features - CURRENTLY ONLY USING VIBRATION - need to ADD DERIVED TACHOMETER AS WELL
 featureTable = table2timetable(features);

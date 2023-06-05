@@ -1,3 +1,5 @@
+%takes our condition indicator and fits the model
+
 %we load our wind turbine condition indicator
 %we want to implement unsupervised learning - we do not pre train the model
 load('test_data.mat')
